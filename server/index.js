@@ -10,8 +10,9 @@ const port = process.env.PORT || 3000;
 
 
 const corsOptions = {
-    origin: [process.env.frontend_url, 'http://localhost:5173'], 
-    optionsSuccessStatus: 200,
+    AccessControlAllowOrigin: '*',  
+  origin: '*',  
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' 
 };
 
 //database connection
