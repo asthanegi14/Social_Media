@@ -10,9 +10,10 @@ const port = process.env.PORT || 3000;
 
 
 const corsOptions = {
-    AccessControlAllowOrigin: '*',  
-  origin: '*',  
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE' 
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+    optionsSuccessStatus: 204
 };
 
 //database connection
