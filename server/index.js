@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 
 
 const corsOptions = {
-    origin: 'https://darling-druid-bc8fd5.netlify.app/', 
+    origin: process.env.frontend_url, 
     optionsSuccessStatus: 200,
 };
 
