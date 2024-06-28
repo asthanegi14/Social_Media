@@ -8,6 +8,12 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+const corsOptions = {
+    origin: 'https://darling-druid-bc8fd5.netlify.app/', 
+    optionsSuccessStatus: 200,
+};
+
 //database connection
 
 mongoose.connect(process.env.MongoDb_Url, {
@@ -22,7 +28,7 @@ db.once('open', ()=>console.log("connected to the database"));
 
 
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
