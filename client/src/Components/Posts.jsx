@@ -15,6 +15,7 @@ export default function Posts() {
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
     useEffect(() => {
+        console.log("backendUrl = " + backendUrl);
         const fetchPosts = async () => {
             try {
                 const response = await axios.get(`${backendUrl}/getAllPosts`);

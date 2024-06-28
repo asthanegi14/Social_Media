@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 
 
 const corsOptions = {
-    origin: process.env.frontend_url, 
+    origin: [process.env.frontend_url, 'http://localhost:5173'], 
     optionsSuccessStatus: 200,
 };
 
