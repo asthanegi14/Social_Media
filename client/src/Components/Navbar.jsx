@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function NavbarComponent() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -14,7 +14,8 @@ function NavbarComponent() {
         setIsLoggedIn(!!token);
     }, []);
 
-    const handleLogout = () => {
+    const handleLogout = (event) => {
+        event.preventDefault(); // Prevent default anchor tag behavior
         localStorage.removeItem('token');
         setIsLoggedIn(false);
         navigate('/login'); // Redirect to login page after logout
@@ -23,7 +24,7 @@ function NavbarComponent() {
     return (
         <Navbar bg="light" expand="lg" className="bg-body-tertiary">
             <Container>
-                <Navbar.Brand href="/">Facebook</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/">Facebook</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     {isLoggedIn ? (
@@ -32,8 +33,8 @@ function NavbarComponent() {
                         </Nav>
                     ) : (
                         <Nav className="ms-auto gap-2">
-                            <Nav.Link href="/signup" className="border rounded px-4 w-fit">Sign Up</Nav.Link>
-                            <Nav.Link href="/login" className="bg-blue-400 rounded text-white px-4 w-fit">Login</Nav.Link>
+                            <Nav.Link as={Link} to="/signup" className="border rounded px-4 w-fit">Sign Up</Nav.Link>
+                            <Nav.Link as={Link} to="/login" className="bg-blue-400 rounded text-white px-4 w-fit">Login</Nav.Link>
                         </Nav>
                     )}
                 </Navbar.Collapse>
