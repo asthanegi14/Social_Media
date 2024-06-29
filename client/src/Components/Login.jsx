@@ -22,18 +22,16 @@ function Login() {
             });
             if (response.data.message === 'User not found') {
                 toast.error("User not found");
-            }
-            if (response.data.message === "Wrong password") {
+            } else if (response.data.message === "Wrong password") {
                 toast.error("Wrong password");
-            }
-            if (response.data.token) {
+            } else if (response.data.token) {
                 localStorage.setItem('token', response.data.token);
                 localStorage.setItem('user', JSON.stringify(response.data.user));
+                localStorage.setItem('userId', response.data.user.userId); // Store userId separately
                 await toast.success("Login Successfully");
-                navigate('/');
+                navigate('/home');
             }
         } catch (e) {
-            console.error("There was an error logging in the user!", e);
             toast.error("Error logging in user");
         }
     };

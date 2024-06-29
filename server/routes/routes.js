@@ -18,10 +18,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage }).single('image');
 
+
 router.post("/register", upload, async (req, res) => {
     try {
         const { email, username, password } = req.body;
-        const image = `/uploads/${req.file.filename}`;
+        const image = `./uploads/${req.file.filename}`
 
         const existingUser = await User.findOne({ $or: [{ email: email }, { name: username }] });
         if (existingUser) {
@@ -69,7 +70,7 @@ router.post("/login", async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.json({ message: 'Login successful', token,  user: { name: user.name, email: user.email, image: user.image } });
+        res.json({ message: 'Login successful', token,  user: { name: user.name, email: user.email, image: user.image, userId: user._id } });
     } catch (e) {
         console.log(e);
         res.json({ message: e.message });
@@ -96,11 +97,13 @@ router.get("/fetchImg", async (req, res) => {
 
 router.post('/post', upload, async (req, res) => {
     try {
-        const { postData, username, userImage } = req.body;
-        const image = `/uploads/${req.file.filename}`;
+        const { postData, username, userImage, userId } = req.body;
         
+        const image = `/uploads/${req.file.filename}`;
+
         const post = new Post({
             name: username,
+            userId: userId, 
             userImage: userImage,
             description: postData,
             image: image,
@@ -157,40 +160,47 @@ router.post('/updateLike', async (req, res) => {
     }
 });
 
-router.post('/addComment', async (req, res) => {
-    const { postId, comment } = req.body;
+router.post('/addComment', upload, async (req, res) => {
+    const { postId, name, userImage, comment } = req.body;
 
     try {
         const post = await Post.findById(postId);
         if (!post) {
-            return res.status(404).json({ success: false, error: 'Post not found' });
+            return res.status(404).json({ success: false, message: 'Post not found' });
         }
 
-        post.comments.push({ text: comment });
+        const newComment = {
+            name,
+            userImage,
+            text: comment,
+            date: new Date()
+        };
+
+        post.comments.push(newComment);
         await post.save();
 
         res.json({ success: true, comments: post.comments });
     } catch (error) {
-        console.error('Error adding comment:', error);
-        res.status(500).json({ success: false, error: 'Server error' });
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 });
 
 router.delete('/deletePost/:postId', async (req, res) => {
-    const postId = req.params.postId;
+    const { post_id } = req.body;
 
     try {
-        const deletedPost = await Post.findByIdAndDelete(postId);
-        if (!deletedPost) {
-            return res.status(404).json({ message: 'Post not found' });
+        const post = await Post.findById(post_id);
+        if (!post) {
+            return res.json({ message: 'Post not found' });
         }
 
+        await Post.findByIdAndDelete(post_id);
         res.json({ success: true, message: 'Post deleted successfully' });
     } catch (error) {
-        console.error("Error deleting post:", error);
         res.status(500).json({ message: 'Server error' });
     }
 });
+
 
 router.put('/updatePassword', async (req, res) => {
     const { email, newPassword } = req.body;
@@ -202,10 +212,6 @@ router.put('/updatePassword', async (req, res) => {
             return res.json({ success: false, message: 'User not found' });
         }
 
-        // if (user._id.toString() !== userId) {
-        //     return res.status(403).json({ success: false, message: 'Unauthorized access' });
-        // }
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
@@ -214,7 +220,6 @@ router.put('/updatePassword', async (req, res) => {
 
         res.json({ success: true, message: 'Password updated successfully' });
     } catch (error) {
-        console.error("Error updating password:", error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 });

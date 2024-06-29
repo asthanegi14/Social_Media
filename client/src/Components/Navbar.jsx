@@ -15,16 +15,16 @@ function NavbarComponent() {
     }, []);
 
     const handleLogout = (event) => {
-        event.preventDefault(); // Prevent default anchor tag behavior
+        event.preventDefault();
         localStorage.removeItem('token');
         setIsLoggedIn(false);
-        navigate('/login'); // Redirect to login page after logout
+        navigate('/');
     };
 
     return (
         <Navbar bg="light" expand="lg" className="bg-body-tertiary">
             <Container>
-                <Navbar.Brand as={Link} to="/">Facebook</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/home">Facebook</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     {isLoggedIn ? (
@@ -34,7 +34,7 @@ function NavbarComponent() {
                     ) : (
                         <Nav className="ms-auto gap-2">
                             <Nav.Link as={Link} to="/signup" className="border rounded px-4 w-fit">Sign Up</Nav.Link>
-                            <Nav.Link as={Link} to="/login" className="bg-blue-400 rounded text-white px-4 w-fit">Login</Nav.Link>
+                            <Nav.Link as={Link} to="/" className="bg-blue-400 rounded text-white px-4 w-fit">Login</Nav.Link>
                         </Nav>
                     )}
                 </Navbar.Collapse>

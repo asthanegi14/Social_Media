@@ -14,6 +14,7 @@ function Registration() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [image, setImage] = useState(defaultImage);
     const [previewImage, setPreviewImage] = useState(defaultImage);
+    const [isLoading, setIsLoading] = useState(false);
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -31,6 +32,8 @@ function Registration() {
             return;
         }
 
+        setIsLoading(true);
+
         const formData = new FormData();
         formData.append('email', email);
         formData.append('username', username);
@@ -44,16 +47,15 @@ function Registration() {
                 }
             });
 
-            if (response.data.message == "User registered successfully!") {
+            if (response.data.message === "User registered successfully!") {
                 toast.success(response.data.message);
-            }
-            else {
+            } else {
                 toast.error(response.data.message);
             }
-        }
-        catch (e) {
-            console.error("There was an error registering the user!", e);
-            toast.error("There was an error registering the user!", e);
+        } catch (e) {
+            toast.error("There was an error registering the user!");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -67,7 +69,7 @@ function Registration() {
 
                 <Form.Group controlId="formBasicImage">
                     <Form.Label>Profile Image</Form.Label>
-                    <Form.Control type="file" onChange={handleImageChange} id="image" />
+                    <Form.Control type="file" onChange={handleImageChange} id="image" name="image" />
                 </Form.Group>
 
                 <Form.Group controlId="formBasicEmail">
@@ -97,10 +99,17 @@ function Registration() {
                         onChange={(e) => setConfirmPassword(e.target.value)} />
                 </Form.Group>
 
-                <Button variant="primary" type="submit">
-                    Sign Up
-                </Button>
-                <p className='flex text-sm text-nowrap gap-2'>Already have an account? <Link to="/login" className='text-red-400 text-nowrap'>Login</Link></p>
+                {isLoading ? (
+                    <Button variant="primary" disabled>
+                        Loading...
+                    </Button>
+                ) : (
+                    <Button variant="primary" type="submit">
+                        Sign Up
+                    </Button>
+                )}
+
+                <p className='flex text-sm text-nowrap gap-2'>Already have an account? <Link to="/" className='text-red-400 text-nowrap'>Login</Link></p>
             </Form>
         </div>
     );

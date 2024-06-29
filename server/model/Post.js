@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const commentSchema = new mongoose.Schema({
+    name:{
+        type: String
+    },
+    userImage:{
+        type: String
+    },
     text: {
         type: String,
     },
@@ -12,6 +18,10 @@ const commentSchema = new mongoose.Schema({
 
 const postSchema = new mongoose.Schema({
     name: {
+        type: String,
+        required: true
+    },
+    userId:{
         type: String,
         required: true
     },

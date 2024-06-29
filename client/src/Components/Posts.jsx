@@ -12,10 +12,13 @@ export default function Posts() {
     const [liked, setLiked] = useState({});
     const [comment, setComment] = useState({});
     const [commentTxt, setCommentText] = useState('');
+    const userId = localStorage.getItem('userId');
+    const userData = JSON.parse(localStorage.getItem('user'));
+    const username = userData.name;
+    const userImage = userData.image;
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
     useEffect(() => {
-        console.log("backendUrl = " + backendUrl);
         const fetchPosts = async () => {
             try {
                 const response = await axios.get(`${backendUrl}/getAllPosts`);
@@ -54,7 +57,7 @@ export default function Posts() {
         if (!commentTxt.trim()) return;
 
         try {
-            const response = await axios.post(`${backendUrl}/addComment`, { postId, comment: commentTxt });
+            const response = await axios.post(`${backendUrl}/addComment`, { postId, name: username, userImage, comment: commentTxt });
             if (response.data.success) {
                 setPosts((prevPosts) =>
                     prevPosts.map((post) =>
@@ -63,20 +66,29 @@ export default function Posts() {
                 );
                 setCommentText('');
                 setComment({ ...comment, [postId]: false });
-                toast.success("Comment posted sucessfully");
+                toast.success("Comment posted successfully");
             }
         } catch (error) {
             console.error("There was an error adding the comment!", error);
         }
     };
 
-    const handleDeletePost = async (postId) => {
+    const handleDeletePost = async (postId, postUserId, post_id) => {
+        if (postId !== postUserId) {
+            toast.error("You are not authorized to delete this post");
+            return;
+        }
+
         try {
-            const response = await axios.delete(`${backendUrl}/deletePost/${postId}`);
+            const response = await axios.delete(`${backendUrl}/deletePost/${post_id}`, {
+                data: { post_id }
+            });
             if (response.data.success) {
                 setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
-
                 toast.success("Post Deleted");
+                window.location.reload();
+            } else {
+                console.log("error");
             }
         } catch (error) {
             console.error("There was an error deleting the post!", error);
@@ -93,10 +105,12 @@ export default function Posts() {
             {posts.map(post => (
                 <div key={post._id} className='flex flex-col justify-start items-left bg-slate-200 p-4 rounded gap-2'>
                     <div className="flex gap-4">
-                        <img src={post.userImage ? `${backendUrl}${post.userImage}` : profile} alt="Profile" className='w-14 h-14 rounded-full' />
-                        <div className='flex flex-col justify-letf items-left'>
+                        <img src={post.userImage ? `${backendUrl}/${post.userImage}` : profile} alt="Profile" className='w-14 h-14 rounded-full object-cover' />
+                        <div className='flex flex-col justify-left items-left'>
                             <h2 className='font-bold'>{post.name}</h2>
-                            <p className="text-red-400 cursor-pointer" onClick={() => handleDeletePost(post._id)}>Delete post</p>
+                            {post.userId == userId && (
+                                <p className="text-red-400 cursor-pointer" onClick={() => handleDeletePost(post.userId, userId, post._id)}>Delete post</p>
+                            )}
                         </div>
                     </div>
                     <div className="flex flex-col gap-2">

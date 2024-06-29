@@ -1,15 +1,19 @@
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Spinner from 'react-bootstrap/Spinner'; // Import Spinner
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import defaultImage from '../assets/defaultImg.png';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 function AddPost() {
+    const navigate = useNavigate();
     const [image, setImage] = useState(defaultImage);
     const [previewImage, setPreviewImage] = useState(defaultImage);
     const [postData, setPostData] = useState('');
+    const [loading, setLoading] = useState(false);
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
     const user = JSON.parse(localStorage.getItem('user'));
 
@@ -25,12 +29,14 @@ function AddPost() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         const formData = new FormData();
         formData.append('image', image);
         formData.append('postData', postData);
         formData.append('username', user?.name);
         formData.append('userImage', user?.image);
+        formData.append('userId', user?.userId);
 
         try {
             const response = await axios.post(`${backendUrl}/post`, formData, {
@@ -41,12 +47,14 @@ function AddPost() {
 
             if (response.data.message === "Post added successfully!") {
                 toast.success(response.data.message);
+                navigate('/home');
             } else {
                 toast.error(response.data.message);
             }
         } catch (e) {
-            console.error("There was an error posting!", e);
             toast.error("There was an error posting!");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -78,8 +86,8 @@ function AddPost() {
 
                 <img src={previewImage} alt="profile" className='rounded self-center border-2 border-gray-400 object-cover' style={{ width: '150px', height: '150px' }} />
 
-                <Button variant="primary" type="submit">
-                    Add this post
+                <Button variant="primary" type="submit" disabled={loading}>
+                    {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Add this post'}
                 </Button>
             </Form>
         </div>

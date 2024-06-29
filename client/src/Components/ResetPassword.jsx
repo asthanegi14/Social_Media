@@ -44,7 +44,6 @@ function ResetPassword() {
                 toast.error(response.data.message);
             }
         } catch (error) {
-            console.error("Error resetting password:", error);
             toast.error("Error resetting password");
         }
     };
